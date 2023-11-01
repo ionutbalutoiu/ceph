@@ -486,8 +486,17 @@ struct AWSSyncConfig {
     return 0;
   }
 
+  string get_namespaced_name(const rgw_bucket bucket) {
+    string name;
+    if (!bucket.tenant.empty()) {
+      name += bucket.tenant + string("/");
+    }
+    name += bucket.name;
+    return name;
+  }
+
   bool do_find_profile(const rgw_bucket bucket, std::shared_ptr<AWSSyncConfig_Profile> *result) {
-    const string& name = bucket.name;
+    const string& name = get_namespaced_name(bucket);
     auto iter = explicit_profiles.upper_bound(name);
     if (iter == explicit_profiles.begin()) {
       return false;
